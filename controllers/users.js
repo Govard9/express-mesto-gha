@@ -31,11 +31,15 @@ module.exports.getUserById = (req, res) => {
   const { id } = req.params;
 
   User.findById(id)
-    .orFail(new Error('notValidUserId'))
+    .orFail(new Error('DocumentNotFoundError'))
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Передан некорректный id пользователя.' });
+        return;
+      }
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: 'Нет пользователя с таким id.' });
         return;
       }
       res.status(500).send({ message: 'Ошибка запроса.' });
