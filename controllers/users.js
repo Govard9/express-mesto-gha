@@ -31,7 +31,7 @@ module.exports.getUserById = (req, res) => {
   const { id } = req.params;
 
   User.findById(id)
-    .orFail(new Error('DocumentNotFoundError'))
+    .orFail()
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
