@@ -1,20 +1,21 @@
 const Card = require('../models/card');
 
 module.exports.createCard = (req, res) => {
-  const { name, link } = req.body || {};
+  const { name, link } = req.body;
   const owner = req.user._id;
-
-  if (!name || !link) {
-    res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
-    return;
-  }
 
   // записываем данные в базу
   Card.create({ name, link, owner })
     // возвращаем записанные в базу данные пользователю
     .then((card) => res.status(200).send(card))
     // если данные не записались, вернём ошибку
-    .catch(() => res.status(500).send({ message: 'Ошибка запроса.' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' });
+        return;
+      }
+      res.status(500).send({ message: 'Ошибка запроса.' });
+    });
 };
 
 module.exports.getCard = (req, res) => {
