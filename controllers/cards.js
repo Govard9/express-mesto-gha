@@ -40,11 +40,6 @@ module.exports.cardDelete = (req, res) => {
 };
 
 module.exports.likeCard = (req, res) => {
-  if (!req.params.id) {
-    res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка.' });
-    return;
-  }
-
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
@@ -54,18 +49,18 @@ module.exports.likeCard = (req, res) => {
     .catch((err) => {
       if (err.message === 'notValidLikeForCard') {
         res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
-      } else {
-        res.status(500).send({ message: 'Ошибка запроса.' });
       }
+
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка.' });
+        return;
+      }
+
+      res.status(500).send({ message: 'Ошибка запроса.' });
     });
 };
 
 module.exports.dislikeCard = (req, res) => {
-  if (!req.params.id) {
-    res.status(400).send({ message: 'Переданы некорректные данные для удаления лайка.' });
-    return;
-  }
-
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
@@ -75,8 +70,13 @@ module.exports.dislikeCard = (req, res) => {
     .catch((err) => {
       if (err.message === 'notValidDeleteLike') {
         res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
-      } else {
-        res.status(500).send({ message: 'Ошибка запроса.' });
       }
+
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные для удаления лайка.' });
+        return;
+      }
+
+      res.status(500).send({ message: 'Ошибка запроса.' });
     });
 };
