@@ -13,7 +13,7 @@ module.exports.postUser = (req, res) => {
     // возвращаем записанные в базу данные пользователю
     .then((user) => res.status(200).send(user))
     // если данные не записались, вернём ошибку
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' }));
 };
 
 module.exports.getUser = (req, res) => {
