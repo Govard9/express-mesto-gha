@@ -36,7 +36,7 @@ module.exports.cardDelete = (req, res) => {
       }
 
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные для удаления лайка.' });
+        res.status(400).send({ message: 'Переданы некорректные данные для удаления карточки.' });
         return;
       }
 
