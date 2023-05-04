@@ -1,19 +1,19 @@
 const User = require('../models/user');
 
 module.exports.postUser = (req, res) => {
-  const { name, about, avatar } = req.body || {};
-
-  if (!name || !about || !avatar) {
-    res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-    return;
-  }
+  const { name, about, avatar } = req.body;
 
   // записываем данные в базу
   User.create({ name, about, avatar })
     // возвращаем записанные в базу данные пользователю
     .then((user) => res.status(200).send(user))
     // если данные не записались, вернём ошибку
-    .catch(() => res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя.'})
+      }
+      res.status(500).send({message: 'Произошла ошибка'})
+    });
 };
 
 module.exports.getUser = (req, res) => {
