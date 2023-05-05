@@ -6,7 +6,7 @@ module.exports.postUser = (req, res) => {
   // записываем данные в базу
   User.create({ name, about, avatar })
     // возвращаем записанные в базу данные пользователю
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.status(201).send(user))
     // если данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -32,7 +32,7 @@ module.exports.getUserById = (req, res) => {
 
   User.findById(id)
     .orFail()
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Передан некорректный id пользователя.' });
@@ -62,10 +62,10 @@ module.exports.updateProfile = (req, res) => {
       runValidators: true, // данные будут валидированы перед изменением
     },
   )
-    .orFail(new Error('notValidUpdateProfile'))
-    .then((user) => res.status(200).send({ data: user }))
+    .orFail()
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.message === 'notValidUpdateProfile') {
+      if (err.message === 'CastError') {
         res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
       } else {
         res.status(500).send({ message: 'Ошибка запроса.' });
@@ -89,10 +89,10 @@ module.exports.updateAvatar = (req, res) => {
       runValidators: true, // данные будут валидированы перед изменением
     },
   )
-    .orFail(new Error('notValidAvatar'))
-    .then((user) => res.status(200).send({ data: user }))
+    .orFail()
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.message === 'notValidUser') {
+      if (err.message === 'CastError') {
         res.status(404).send({ message: 'Такого пользователя не существует.' });
       } else {
         res.status(500).send({ message: err.errors.avatar.message });

@@ -7,7 +7,7 @@ module.exports.createCard = (req, res) => {
   // записываем данные в базу
   Card.create({ name, link, owner })
     // возвращаем записанные в базу данные пользователю
-    .then((card) => res.status(200).send(card))
+    .then((card) => res.status(201).send(card))
     // если данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -28,11 +28,12 @@ module.exports.getCard = (req, res) => {
 
 module.exports.cardDelete = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
-    .orFail(new Error('notValidCardForDelete'))
-    .then((card) => res.send({ data: card }))
+    .orFail(new Error('cardNotFound'))
+    .then((card) => res.send(card))
     .catch((err) => {
-      if (err.message === 'notValidCardForDelete') {
+      if (err.message === 'cardNotFound') {
         res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+        return;
       }
 
       if (err.name === 'CastError') {
@@ -50,10 +51,11 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   ).orFail(new Error('notValidLikeForCard'))
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.message === 'notValidLikeForCard') {
         res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+        return;
       }
 
       if (err.name === 'CastError') {
@@ -71,10 +73,11 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   ).orFail(new Error('notValidDeleteLike'))
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.message === 'notValidDeleteLike') {
         res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+        return;
       }
 
       if (err.name === 'CastError') {
