@@ -66,10 +66,11 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.message === 'CastError') {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
-      } else {
-        res.status(500).send({ message: 'Ошибка запроса.' });
+        res.status(400).send({ message: 'Невалидный id пользователя.' });
+        return;
       }
+
+      res.status(500).send({ message: 'Ошибка запроса.' });
     });
 };
 
@@ -93,9 +94,10 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.message === 'CastError') {
-        res.status(404).send({ message: 'Такого пользователя не существует.' });
-      } else {
-        res.status(500).send({ message: err.errors.avatar.message });
+        res.status(400).send({ message: 'Невалидный id пользователя.' });
+        return;
       }
+
+      res.status(500).send({ message: err.errors.avatar.message });
     });
 };
