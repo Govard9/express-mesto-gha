@@ -47,12 +47,7 @@ module.exports.getUserById = (req, res) => {
 };
 
 module.exports.updateProfile = (req, res) => {
-  const { name, about } = req.body || {};
-
-  if (!name || !about) {
-    res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-    return;
-  }
+  const { name, about } = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
@@ -66,7 +61,12 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.message === 'CastError') {
-        res.status(400).send({ message: 'Невалидный id пользователя.' });
+        res.status(400).send({ message: 'Невалидные данные для обновления пользователя.' });
+        return;
+      }
+
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: 'Нет пользователя с таким id.' });
         return;
       }
 
@@ -75,12 +75,7 @@ module.exports.updateProfile = (req, res) => {
 };
 
 module.exports.updateAvatar = (req, res) => {
-  const { avatar } = req.body || {};
-
-  if (!avatar) {
-    res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
-    return;
-  }
+  const { avatar } = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
@@ -94,7 +89,12 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.message === 'CastError') {
-        res.status(400).send({ message: 'Невалидный id пользователя.' });
+        res.status(400).send({ message: 'Невалидные данные для обновления аватара.' });
+        return;
+      }
+
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: 'Нет пользователя с таким id.' });
         return;
       }
 
