@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const router = require('./routes/index');
+const auth = require('./middlewares/auth');
 const { login, createUser } = require('./controllers/users');
 
 const app = express();
