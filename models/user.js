@@ -4,6 +4,7 @@ const validator = require('validator');
 const userSchema = new mongoose.Schema(
   {
     email: {
+      type: String,
       required: [true, 'Поле name обязательно к заполнению.'],
       unique: [true, 'Такой email уже использует кто-то другой.'],
       validate: {
@@ -12,17 +13,18 @@ const userSchema = new mongoose.Schema(
       },
     },
     password: {
+      type: String,
       required: [true, 'Поле name обязательно к заполнению.'],
     },
     name: {
       type: String,
-      required: [true, 'Поле name обязательно к заполнению.'],
+      default: 'Жак-Ив Кусто',
       minlength: [2, 'Минимальная длинна поля - 2 символа.'],
       maxlength: [30, 'Максимальная длинна поля - 30 символов.'],
     },
     about: {
       type: String,
-      required: [true, 'Поле name обязательно к заполнению.'],
+      default: 'Исследователь',
       minlength: [2, 'Минимальная длинна поля - 2 символа.'],
       maxlength: [30, 'Максимальная длинна поля - 30 символов.'],
     },
@@ -32,7 +34,7 @@ const userSchema = new mongoose.Schema(
         validator: (v) => validator.isURL(v),
         message: 'Некорректный URL.',
       },
-      required: [true, 'Поле name обязательно к заполнению.'],
+      default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     },
   },
   { versionKey: false },

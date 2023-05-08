@@ -1,10 +1,16 @@
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
 
 module.exports.postUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-
   // записываем данные в базу
-  User.create({ name, about, avatar })
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      email: req.body.email,
+      password: hash,
+      name: req.body.name,
+      about: req.body.about,
+      avatar: req.body.avatar,
+    }))
     // возвращаем записанные в базу данные пользователю
     .then((user) => res.status(201).send(user))
     // если данные не записались, вернём ошибку
