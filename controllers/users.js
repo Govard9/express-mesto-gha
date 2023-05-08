@@ -35,8 +35,7 @@ module.exports.login = (req, res) => {
     });
 };
 
-module.exports.postUser = (req, res) => {
-  // записываем данные в базу
+module.exports.createUser = (req, res) => {
   bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       email: req.body.email,
