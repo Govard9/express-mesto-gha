@@ -85,6 +85,25 @@ module.exports.getUserById = (req, res) => {
     });
 };
 
+module.exports.getUserMe = (req, res) => {
+  const { id } = req.params;
+
+  User.findById(id)
+    .orFail()
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Нет прав для просмотра профиля.' });
+        return;
+      }
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: 'Нет пользователя с таким id.' });
+        return;
+      }
+      res.status(500).send({ message: 'Ошибка запроса.' });
+    });
+};
+
 module.exports.updateProfile = (req, res) => {
   const { name, about } = req.body || {};
 
