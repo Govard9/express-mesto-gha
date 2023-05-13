@@ -7,7 +7,12 @@ const {
   getUserMe,
   updateProfile,
   updateAvatar,
+  login,
+  createUser,
 } = require('../controllers/users');
+
+router.post('/signin', login);
+router.post('/signup', createUser);
 
 router.get('/users', auth, getUser);
 router.get('/users/me', auth, getUserMe);
