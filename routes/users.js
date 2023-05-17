@@ -23,7 +23,8 @@ router.post('/signin', celebrate({
         .required()
         .email(),
       password: Joi.string()
-        .required(),
+        .required()
+        .min(3),
     }),
 }), login);
 
@@ -34,7 +35,8 @@ router.post('/signup', celebrate({
         .required()
         .email(),
       password: Joi.string()
-        .required(),
+        .required()
+        .min(3),
       name: Joi.string()
         .min(2)
         .max(30),
@@ -47,8 +49,35 @@ router.post('/signup', celebrate({
 
 router.get('/users', auth, getUser);
 router.get('/users/me', auth, getUserMe);
-router.get('/users/:id', auth, getUserById);
-router.patch('/users/me', auth, updateProfile);
-router.patch('/users/me/avatar', auth, updateAvatar);
+router.get('/users/:id', celebrate({
+  params: Joi.object()
+    .keys({
+      userId: Joi.string()
+        .required()
+        .hex()
+        .length(24),
+    }),
+}), auth, getUserById);
+router.patch('/users/me', celebrate({
+  body: Joi.object()
+    .keys({
+      name: Joi.string()
+        .required()
+        .min(2)
+        .max(30),
+      about: Joi.string()
+        .required()
+        .min(2)
+        .max(30),
+    }),
+}), auth, updateProfile);
+router.patch('/users/me/avatar', celebrate({
+  body: Joi.object()
+    .keys({
+      avatar: Joi.string()
+        .required()
+        .pattern('/https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/'),
+    }),
+}), auth, updateAvatar);
 
 module.exports = router;
