@@ -49,8 +49,13 @@ module.exports.createUser = (req, res, next) => {
       avatar: req.body.avatar,
     }))
     // возвращаем записанные в базу данные пользователю
-    .then((user) => res.status(201)
-      .send(user))
+    .then((user) => {
+      const doNotPassword = user.toObject({ useProjection: true });
+
+      res.status(201)
+        .send(doNotPassword);
+    })
+
     // если данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {
