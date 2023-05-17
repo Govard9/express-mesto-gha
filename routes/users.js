@@ -32,7 +32,7 @@ router.post('/signin', celebrate({
       about: Joi.string()
         .min(2)
         .max(30),
-      avatar: Joi.string()
+      avatar: Joi.string(),
     }),
 }), login);
 
