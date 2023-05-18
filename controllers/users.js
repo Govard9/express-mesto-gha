@@ -90,9 +90,7 @@ module.exports.getUserById = (req, res, next) => {
     });
 };
 
-module.exports.getUserMe = (req, res, next) => {
-  const { id } = req.params;
-
+const findUser = (id, res, next) => {
   User.findById(id)
     .orFail()
     .then((user) => res.send(user))
@@ -103,6 +101,8 @@ module.exports.getUserMe = (req, res, next) => {
       return next(err);
     });
 };
+
+module.exports.getUserMe = (req, res, next) => findUser(req.params.userId, res, next);
 
 module.exports.updateProfile = (req, res, next) => {
   const {
