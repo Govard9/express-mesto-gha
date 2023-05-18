@@ -3,6 +3,8 @@ const {
   celebrate,
   Joi,
 } = require('celebrate');
+
+const regexp = /(https?:\/\/)(w{3}\.)?\w+[-.~:/?#[\]@!$&'()*+,;=]*#?/;
 const auth = require('../middlewares/auth');
 const {
   getCard, cardDelete, createCard, likeCard, dislikeCard,
@@ -14,7 +16,12 @@ router.delete('/cards/:id', celebrate({
     id: Joi.string().required().hex().length(24),
   }),
 }), auth, cardDelete);
-router.post('/cards', auth, createCard);
+router.post('/cards', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().pattern(regexp),
+  }),
+}), auth, createCard);
 router.put('/cards/:id/likes', celebrate({
   params: Joi.object().keys({
     id: Joi.string().required().hex().length(24),
