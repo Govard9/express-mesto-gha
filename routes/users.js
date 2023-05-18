@@ -58,16 +58,16 @@ router.post('/signup', celebrate({
 
 router.get('/users', auth, getUser);
 router.get('/users/me', auth, getUserMe);
-router.get('/users/:id', auth, celebrate({
+router.get('/users/:id', celebrate({
   params: Joi.object()
     .keys({
-      userId: Joi.string()
+      id: Joi.string()
         .required()
         .hex()
         .length(24),
     }),
-}), getUserById);
-router.patch('/users/me', auth, celebrate({
+}), auth, getUserById);
+router.patch('/users/me', celebrate({
   body: Joi.object()
     .keys({
       name: Joi.string()
@@ -79,14 +79,14 @@ router.patch('/users/me', auth, celebrate({
         .min(2)
         .max(30),
     }),
-}), updateProfile);
-router.patch('/users/me/avatar', auth, celebrate({
+}), auth, updateProfile);
+router.patch('/users/me/avatar', celebrate({
   body: Joi.object()
     .keys({
       avatar: Joi.string()
         .required()
         .pattern(regexp),
     }),
-}), updateAvatar);
+}), auth, updateAvatar);
 
 module.exports = router;

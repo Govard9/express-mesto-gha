@@ -75,9 +75,7 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.getUserById = (req, res, next) => {
-  const { id } = req.params;
-
-  User.findById(id)
+  User.findById(req.params.id)
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
