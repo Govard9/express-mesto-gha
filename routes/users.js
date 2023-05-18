@@ -4,6 +4,7 @@ const {
   celebrate,
   Joi,
 } = require('celebrate');
+const auth = require('../middlewares/auth');
 
 const regexp = /(https?:\/\/)(w{3}\.)?\w+[-.~:/?#[\]@!$&'()*+,;=]*#?/;
 
@@ -55,9 +56,9 @@ router.post('/signup', celebrate({
     }),
 }), createUser);
 
-router.get('/users', getUser);
-router.get('/users/me', getUserMe);
-router.get('/users/:id', celebrate({
+router.get('/users', auth, getUser);
+router.get('/users/me', auth, getUserMe);
+router.get('/users/:id', auth, celebrate({
   params: Joi.object()
     .keys({
       userId: Joi.string()
@@ -66,7 +67,7 @@ router.get('/users/:id', celebrate({
         .length(24),
     }),
 }), getUserById);
-router.patch('/users/me', celebrate({
+router.patch('/users/me', auth, celebrate({
   body: Joi.object()
     .keys({
       name: Joi.string()
@@ -79,7 +80,7 @@ router.patch('/users/me', celebrate({
         .max(30),
     }),
 }), updateProfile);
-router.patch('/users/me/avatar', celebrate({
+router.patch('/users/me/avatar', auth, celebrate({
   body: Joi.object()
     .keys({
       avatar: Joi.string()

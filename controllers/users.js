@@ -19,22 +19,20 @@ module.exports.login = (req, res, next) => {
         return next(new ErrorAuthorization('Неправильные почта или пароль.'));
       }
 
-      return bcrypt.compare(password, user.password);
-    })
-    .then((matched) => {
-      if (!matched) {
-        // хеши не совпали — отклоняем промис
-        return next(new ErrorAuthorization('Неправильные почта или пароль.'));
-      }
-
-      const token = jwt.sign(
-        { _id: matched._id },
-        'b5581cf09f1177d89ef6a4c822b05c847d8a71eb1d9adb2949d4fab9a6edf596',
-        { expiresIn: '7d' },
-      );
-
-      // аутентификация успешна
-      return res.send({ _id: token });
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            // хеши не совпали — отклоняем промис
+            return next(new ErrorAuthorization('Неправильные почта или пароль.'));
+          }
+          const token = jwt.sign(
+            { _id: user._id },
+            'b5581cf09f1177d89ef6a4c822b05c847d8a71eb1d9adb2949d4fab9a6edf596',
+            { expiresIn: '7d' },
+          );
+          // аутентификация успешна
+          return res.send({ _id: token });
+        });
     })
     .catch(next);
 };
@@ -91,9 +89,7 @@ module.exports.getUserById = (req, res, next) => {
 };
 
 module.exports.getUserMe = (req, res, next) => {
-  const { id } = req.params;
-
-  User.findById(id)
+  User.findById(req.user._id)
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
