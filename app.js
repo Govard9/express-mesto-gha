@@ -6,6 +6,8 @@ const router = require('./routes/index');
 
 const app = express();
 
+const handleErrors = require('./middlewares/handleErrors');
+
 app.use(helmet());
 
 app.use(express.json());
@@ -22,16 +24,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 
 app.use(errors()); // обработчик ошибок celebrate
 
-module.exports = (err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500 ? 'На сервера произошла ошибка.' : message,
-    });
-
-  next();
-};
+app.use(handleErrors);
 
 app.listen(3000, () => { console.log('Server started.'); });
