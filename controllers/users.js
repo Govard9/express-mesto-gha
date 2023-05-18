@@ -96,7 +96,12 @@ module.exports.getUserMe = (req, res, next) => {
   User.findById(id)
     .orFail()
     .then((user) => res.send(user))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        return next(new NotFoundError('Пользователь не найден.'));
+      }
+      return next(err);
+    });
 };
 
 module.exports.updateProfile = (req, res, next) => {
