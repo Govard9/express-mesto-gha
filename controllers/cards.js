@@ -1,4 +1,7 @@
 const Card = require('../models/card');
+const AccessDenied = require('../errors/access-denied');
+const NotFoundError = require('../errors/not-found-err');
+const InvalidRequest = require('../errors/invalid-request');
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
@@ -26,22 +29,26 @@ module.exports.getCard = (req, res) => {
     .catch(() => res.status(500).send({ message: 'Ошибка запроса.' }));
 };
 
-module.exports.cardDelete = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
-    .orFail(new Error('cardNotFound'))
-    .then((card) => res.send(card))
+module.exports.cardDelete = (req, res, next) => {
+  const userId = req.user._id;
+
+  Card.findById(req.params.id)
+    .orFail()
+    .then((card) => {
+      if (card.owner.toString() !== userId) {
+        throw new AccessDenied('Вы не можете удалить эту карточку');
+      }
+      return Card.findByIdAndDelete(card._id);
+    })
+    .then((deletedCard) => res.status(200).send(deletedCard))
     .catch((err) => {
-      if (err.message === 'cardNotFound') {
-        res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
-        return;
+      if (err.name === 'DocumentNotFoundError') {
+        return next(new NotFoundError('Карточка не найдена.'));
       }
-
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные для удаления карточки.' });
-        return;
+      if (err.name === 'ValidationError') {
+        return next(new InvalidRequest('Переданы не корректные данные'));
       }
-
-      res.status(500).send({ message: 'Ошибка запроса.' });
+      return next(err);
     });
 };
 
