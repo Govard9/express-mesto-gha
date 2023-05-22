@@ -119,8 +119,8 @@ module.exports.updateProfile = (req, res, next) => {
     .then((user) => res.status(200)
       .send(user))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        return next(new NotFoundError('Пользователь не найден.'));
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        return next(new InvalidRequest('Пользователь не найден.'));
       }
       return next(err);
     });
@@ -137,8 +137,13 @@ module.exports.updateAvatar = (req, res, next) => {
       runValidators: true, // данные будут валидированы перед изменением
     },
   )
-    .orFail()
+    .orFail(() => new NotFoundError('Пользователь с указанным id не существует'))
     .then((user) => res.status(200)
       .send(user))
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError' || err.name === 'ValidationError') {
+        return next(new InvalidRequest('Пользователь не найден.'));
+      }
+      return next(err);
+    });
 };
