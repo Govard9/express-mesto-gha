@@ -35,7 +35,7 @@ module.exports.cardDelete = (req, res, next) => {
     .orFail()
     .then((card) => {
       if (card.owner.toString() !== userId) {
-        return next(new AccessDenied('Вы не можете удалить эту карточку'));
+        throw new AccessDenied('Вы не можете удалить эту карточку');
       }
       return Card.findByIdAndDelete(card._id);
     })
